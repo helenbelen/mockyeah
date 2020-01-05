@@ -1,5 +1,6 @@
 src/**/*.js
 dist
+webpack.config.js
 
 *.map
 
