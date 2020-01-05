@@ -25,3 +25,13 @@ const refetch = async () => {
 window.refetch = refetch;
 
 refetch();
+
+const button = document.createElement('button')
+
+button.innerText = 'refetch'
+
+button.addEventListener('click', () => {
+    refetch();
+})
+
+document.body.appendChild(button)

@@ -74,13 +74,25 @@ const Entry = ({entry, getMocks}) => {
     )
 };
 
-const Mock = ({mock}) => {
-    const [match, response ] = mock
+const Mock = ({mock, getMocks}) => {
+    const [match, response] = mock
+    const { id } = match.$meta;
     const { url } = match.$meta.originalNormal;
     const { raw } = response;
 
+    const onClickUnmock = useCallback(() => {
+        const script = `
+          window.__MOCKYEAH__.unmock('${id}');
+          window.refetch();
+        `;
+        inspectEval(script);
+        getMocks();
+    });
+
     return (
         <div style={{ display: 'flex'}}>
+            <div><button onClick={onClickUnmock}>x</button></div>
+            <div>{id}</div>
             <div>{url}</div>
             <div>{raw}</div>
         </div>
@@ -164,7 +176,7 @@ const App = () => {
                                 {harLog &&
                                 harLog?.entries?.map(entry => {
 
-                                    return <Entry entry={entry} getMocks={getMocks}/>
+                                    return <Entry entry={entry} getMocks={getMocks} />
                                 })
                                 }
                             </div>
@@ -173,7 +185,7 @@ const App = () => {
                         <TabPanel>
                             <div>
                                 {mocks && mocks.map(mock => {
-                                    return <Mock mock={mock}/>;
+                                    return <Mock mock={mock} getMocks={getMocks} />;
                                 })}
                             </div>
                         </TabPanel>
