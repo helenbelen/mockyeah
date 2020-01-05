@@ -1,6 +1,7 @@
 import React, {useEffect, useState, useCallback} from 'react'
 import ReactDOM from 'react-dom'
 import {Tabs, Tab, TabList, TabPanel} from 'react-tabs'
+import Modal from 'react-modal';
 import 'react-tabs/style/react-tabs.css';
 
 console.log('panel')
@@ -66,7 +67,7 @@ const Entry = ({entry, getMocks}) => {
             {isMocking && (
                 <div>
                     <div>isMocking</div>
-                    <textarea value={responseBody || content} onChange={onChangeResponseBody}/>
+                    <textarea value={responseBody || content} onChange={onChangeResponseBody} />
                     <button onClick={onClickSubmit}>submit</button>
                 </div>
             )}
@@ -74,7 +75,7 @@ const Entry = ({entry, getMocks}) => {
     )
 };
 
-const Mock = ({mock, getMocks}) => {
+const Mock = ({mock, getMocks, editMock}) => {
     const [match, response] = mock
     const { id } = match.$meta;
     const { url } = match.$meta.originalNormal;
@@ -89,13 +90,39 @@ const Mock = ({mock, getMocks}) => {
         getMocks();
     });
 
+    const onClickEdit = useCallback(() => {
+      editMock(id)
+    });
+
     return (
         <div style={{ display: 'flex'}}>
             <div><button onClick={onClickUnmock}>x</button></div>
+            <div><button onClick={onClickEdit}>edit</button></div>
             <div>{id}</div>
             <div>{url}</div>
             <div>{raw}</div>
         </div>
+    )
+};
+
+const EditMockModal = ({ id, mock, closeEditMock }) => {
+    const [match, response] = mock
+
+    const [url, setUrl] = useState(match?.$meta?.originalNormal?.url);
+    const [body, setBody] = useState(response?.raw);
+
+    const onChangeBody = useCallback(e => setBody(e.target.value));
+    const onChangeUrl = useCallback(e => setUrl(e.target.value));
+
+    return (
+        <Modal isOpen onRequestClose={closeEditMock}>
+            <h2>editing mock {id}</h2>
+            <div><textarea value={url} onChange={onChangeUrl} /></div>
+
+            <div><textarea value={body} onChange={onChangeBody} /></div>
+
+                <button onClick={closeEditMock}>close</button>
+            </Modal>
     )
 };
 
@@ -104,6 +131,8 @@ const App = () => {
     const [connected, setConnected] = useState(false);
     const [harLog, setHarLog] = useState();
     const [mocks, setMocks] = useState();
+    const [editingMockId, setEditingMockId] = useState(false);
+    const [editingMock, setEditingMock] = useState();
 
     const refresh = useCallback(() => {
         chrome.devtools.network.getHAR(harLog => {
@@ -154,6 +183,23 @@ const App = () => {
         getMocks();
     }, [getMocks]);
 
+
+    useEffect(() => {
+        if (!mocks) return;
+        const mock = mocks.find(mock => mock[0]?.$meta?.id === editingMockId);
+        if (mock) {
+            setEditingMock(mock);
+        }
+    }, [mocks, editingMockId]);
+
+    const editMock = useCallback(id => {
+        setEditingMockId(id);
+    });
+
+    const closeEditMock = useCallback(() => {
+        setEditingMock(undefined);
+    })
+
     return (
         <div>
             <h1>Mockyeah</h1>
@@ -185,13 +231,14 @@ const App = () => {
                         <TabPanel>
                             <div>
                                 {mocks && mocks.map(mock => {
-                                    return <Mock mock={mock} getMocks={getMocks} />;
+                                    return <Mock mock={mock} getMocks={getMocks} editMock={editMock} />;
                                 })}
                             </div>
                         </TabPanel>
                     </Tabs>
                 </div>
             ) : null}
+            {editingMock && <EditMockModal id={editingMockId} mock={editingMock} closeEditMock={closeEditMock} />}
         </div>
     )
 };
