@@ -1,0 +1,33 @@
+{
+  "name": "mockyeah-web-extension",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "webpack",
+    "dev": "webpack -w",
+    "build:prod": "NODE_ENV=production webpack",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "private": true,
+  "license": "ISC",
+  "devDependencies": {
+    "@types/chrome": "0.0.91",
+    "@types/webpack": "^4.41.1",
+    "@types/webpack-merge": "^4.1.5",
+    "copy-webpack-plugin": "^5.1.1",
+    "html-webpack-plugin": "^3.2.0",
+    "html-webpack-template": "^6.2.0",
+    "ts-loader": "^6.2.1",
+    "ts-node": "^8.5.4",
+    "typescript": "^3.7.4",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
+    "webpack-merge": "^4.2.2"
+  },
+  "dependencies": {
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-tabs": "^3.1.0"
+  }
+}
