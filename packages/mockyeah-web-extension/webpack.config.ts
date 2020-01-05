@@ -49,9 +49,13 @@ const defaults: (env: Args, argv: Args) => Configuration = (
                   noEmitOnError: argv.watch === false
                 }
               }
-            }
+            },
           ]
-        }
+        },
+        {
+          test: /\.css$/,
+          use: ['style-loader', 'css-loader'],
+        },
       ]
     },
     plugins
