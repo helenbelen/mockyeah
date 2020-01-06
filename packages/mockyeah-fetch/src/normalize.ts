@@ -126,6 +126,10 @@ const normalize = (match: Match, incoming?: boolean): MatchNormal => {
     ...match
   };
 
+  if (!match.url) {
+    originalNormal.url = '*';
+  }
+
   $meta.original = originalMatch;
   $meta.originalNormal = originalNormal;
 
